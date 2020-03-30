@@ -110,7 +110,7 @@ String ceaseBrackets(String expression) {
 }
 
 String setVariableValues(String expression, double value) {
-  if (value > 0) {
+  if (value >= 0) {
     return expression.replaceAll('x', '$value');
   }
 

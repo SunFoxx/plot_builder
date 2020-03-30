@@ -1,3 +1,4 @@
+import 'package:function_printer/model/exceptions.dart';
 import 'package:function_printer/utils/parse_helpers.dart';
 
 class ExpressionNode {
@@ -18,28 +19,36 @@ class ExpressionNode {
         ? baseExpression[latestOperatorIndex] == 's'
         : false;
 
-    print(latestOperatorIndex);
     if (latestOperatorIndex <= 0 && !isSqrtOperator) {
-      operand = double.parse(baseExpression);
-      print(
-          'Node with exp: $baseExpression; latestOperator: $latestOperatorIndex; operand: $operand');
+      try {
+        operand = double.parse(baseExpression);
+        print(
+            'Node $operand with exp: $baseExpression; latestOperator: $latestOperatorIndex;');
+      } catch (e) {
+        throw InvalidSyntaxException(baseExpression);
+      }
     } else {
       operator = baseExpression[latestOperatorIndex];
       print(
-          'Node with exp: $baseExpression; latestOperator: $latestOperatorIndex; operator: $operator');
+          'Node $operator with exp: $baseExpression; latestOperator: $latestOperatorIndex;');
 
-      String leftExpression = isSqrtOperator
-          ? "0"
-          : baseExpression.substring(0, latestOperatorIndex);
+      if (!isSqrtOperator) {
+        String leftExpression =
+            baseExpression.substring(0, latestOperatorIndex);
+        print('Left node: $leftExpression');
+        leftNode = ExpressionNode(leftExpression);
+      }
+
       String rightExpression = baseExpression.substring(
         latestOperatorIndex + 1,
         this.baseExpression.length,
       );
 
-      print('Left node: $leftExpression');
-      print('Right node: $rightExpression');
+      if (rightExpression.length == 0) {
+        throw InvalidSyntaxException(baseExpression);
+      }
 
-      leftNode = ExpressionNode(leftExpression);
+      print('Right node: $rightExpression');
       rightNode = ExpressionNode(rightExpression);
     }
   }

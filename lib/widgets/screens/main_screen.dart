@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:function_printer/services/graph_service.dart';
 import 'package:function_printer/state/app_state.dart';
+import 'package:function_printer/theme/text_theme.dart';
 import 'package:function_printer/widgets/graph_painter.dart';
+import 'package:function_printer/widgets/input_field.dart';
+import 'package:function_printer/widgets/radio_button.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -14,58 +18,146 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-              decoration: BoxDecoration(border: Border.all()),
-              child: Row(
-                children: <Widget>[
-                  Flexible(
-                    child: TextField(
-                      onChanged: (text) => {
-                        this.setState(() {
-                          expressionInput = text;
-                        })
-                      },
+      body: ListView(
+        children: <Widget>[
+          Column(
+            children: <Widget>[
+              // inputs section
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.elliptical(10.0, 5.0),
+                    bottomRight: Radius.elliptical(10.0, 5.0),
+                  ),
+                ),
+                child: SafeArea(
+                  child: Consumer<AppState>(
+                    builder: (_, state, children) => Column(
+                      children: <Widget>[
+                        // Expression input
+                        InputField(
+                          leading: Text(
+                            'f(x) = ',
+                            style: inputLeadingStyle,
+                          ),
+                          hintText: 'Input math expression here',
+                          onChanged: (text) {
+                            state.expression = text;
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        // Range Input
+                        Row(
+                          children: <Widget>[
+                            Text(
+                              '[ ',
+                              style: inputLeadingStyle,
+                            ),
+                            Flexible(
+                              child: InputField(
+                                hintText: "Minimum X",
+                                inputType: TextInputType.number,
+                                onChanged: (text) {
+                                  state.leftRange = double.parse(text);
+                                },
+                              ),
+                            ),
+                            Text(
+                              ' : ',
+                              style: inputLeadingStyle,
+                            ),
+                            Flexible(
+                              child: InputField(
+                                hintText: "Maximum X",
+                                inputType: TextInputType.number,
+                                onChanged: (text) {
+                                  state.rightRange = double.parse(text);
+                                },
+                              ),
+                            ),
+                            Text(
+                              ' ]',
+                              style: inputLeadingStyle,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        // Solve method buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            RadioButton(
+                              value: GraphServiceType.MANUAL,
+                              groupValue: state.graphServiceType,
+                              label: "Custom",
+                              onChanged: (value) {
+                                state.graphServiceType = value;
+                              },
+                            ),
+                            SizedBox(width: 5),
+                            RadioButton(
+                              value: GraphServiceType.WOLFRAM,
+                              groupValue: state.graphServiceType,
+                              label: "Wolfram",
+                              onChanged: (value) {
+                                state.graphServiceType = value;
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        // Button
+                        RaisedButton(
+                          onPressed: state.buildGraphPoints,
+                          color: Colors.lightBlueAccent,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Text(
+                            "Run",
+                            style: buttonTextStyle,
+                          ),
+                        ),
+                        state.expressionError != null
+                            ? Center(
+                                child: Text(
+                                  state.expressionError,
+                                  style: errorTextStyle,
+                                ),
+                              )
+                            : SizedBox(),
+                      ],
                     ),
                   ),
-                  SizedBox(width: 15),
-                  Consumer<AppState>(
-                    builder: (_, state, children) {
-                      return IconButton(
-                          icon: Icon(Icons.forward),
-                          onPressed: () {
-                            setState(() {
-                              state.expression = expressionInput;
-                              state.leftRange = -4.0;
-                              state.rightRange = 4.0;
-                              state.buildGraphPoints();
-                            });
-                          });
-                    },
-                  )
-                ],
-              ),
-            ),
-            Consumer<AppState>(builder: (_, state, child) {
-              if (state.graphPoints == null) {
-                return Text('nothing to draw');
-              }
-
-              return Container(
-                padding: EdgeInsets.all(5.0),
-                child: CustomPaint(
-                  painter: GraphPainter(state.graphPoints),
-                  size: Size(double.infinity, 200),
-                  willChange: true,
-                  isComplex: true,
                 ),
-              );
-            })
-          ],
-        ),
+              ),
+              // content section
+              Consumer<AppState>(builder: (_, state, child) {
+                if (state.graphPoints == null) {
+                  return Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: Text('nothing to draw'),
+                  );
+                }
+
+                if (state.expressionError != null) {
+                  return SizedBox();
+                }
+
+                return Container(
+                  padding: EdgeInsets.all(5.0),
+                  child: CustomPaint(
+                    painter: GraphPainter(state.graphPoints),
+                    size: Size(double.infinity, 200),
+                    willChange: true,
+                    isComplex: true,
+                  ),
+                );
+              })
+            ],
+          ),
+        ],
       ),
     );
   }

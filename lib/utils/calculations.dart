@@ -1,3 +1,4 @@
+import 'package:function_printer/model/exceptions.dart';
 import 'package:function_printer/model/expression_node.dart';
 import 'package:function_printer/model/operator.dart';
 import 'package:function_printer/model/postfix.dart';
@@ -7,7 +8,6 @@ double evaluateExpression(ExpressionNode expression) {
   List<PostfixItem> postfix = [];
   extractPostfixFromTree(expression, postfix);
   postfix = postfix.reversed.toList();
-  print(postfix);
 
   return evaluateFromPostfix(postfix);
 }
@@ -42,9 +42,17 @@ double evaluateFromPostfix(List<PostfixItem> postfix) {
       double right = (evaluationStack.pop() as PostfixOperand).value;
 
       if (postfixItem.operator == 's') {
+        if (right < 0) {
+          throw new NegativeNumberSqrtException(right);
+        }
         evaluationStack.push(PostfixOperand(evalFunction(right)));
       } else {
         double left = (evaluationStack.pop() as PostfixOperand).value;
+
+        if (right == 0 && postfixItem.operator == '/') {
+          throw new DivisionByZeroException();
+        }
+
         evaluationStack.push(PostfixOperand(evalFunction(left, right)));
       }
     }
@@ -53,18 +61,6 @@ double evaluateFromPostfix(List<PostfixItem> postfix) {
   result = (evaluationStack.pop() as PostfixOperand).value;
 
   return result;
-}
-
-double evaluateInfixExpression(ExpressionNode expression) {
-  if (expression.operand != null) {
-    return expression.operand;
-  }
-
-  double left = evaluateExpression(expression.leftNode);
-  double right = evaluateExpression(expression.rightNode);
-  Function calculate = OPERATORS_MAP[expression.operator];
-
-  return calculate(left, right);
 }
 
 double getRangePercentage(double leftRange, double rightRange, double value) {

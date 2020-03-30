@@ -12,35 +12,51 @@ class GraphPainter extends CustomPainter {
 
   GraphPainter(this.points);
 
-  void drawXAxisValue(Canvas canvas, Point point, Size size, double xPosition) {
-    TextPainter textPainter = TextPainter(
-      text: TextSpan(
-        text: '${point.x.toStringAsFixed(2)}',
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 12,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
+  void drawXAxisValues(Canvas canvas, Size size, double min, double max) {
     Paint linePaint = Paint()
       ..color = Colors.black
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
-    textPainter.layout(minWidth: 20, maxWidth: size.width);
-    final offset = Offset(
-      xPosition,
-      size.height + AXIS_OFFSET,
-    );
-    final offset2 = Offset(
-      xPosition,
-      size.height,
-    );
-    textPainter.paint(canvas, offset);
-    canvas.drawLine(offset, offset2, linePaint);
+
+    for (int i = 0; i <= 5; i++) {
+      TextPainter textPainter = TextPainter(
+        text: TextSpan(
+          text: '${(min + (max - min) * (0.2 * i)).toStringAsFixed(2)}',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 12,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+
+      textPainter.layout(minWidth: 20, maxWidth: size.width);
+      final offset = Offset(
+        size.width * (0.2 * i),
+        size.height + AXIS_OFFSET,
+      );
+      final offset2 = Offset(
+        size.width * (0.2 * i),
+        size.height,
+      );
+      final textOffset = (i < 5)
+          ? offset
+          : Offset(
+              size.width * (0.2 * i) - 20,
+              size.height + AXIS_OFFSET,
+            );
+
+      textPainter.paint(canvas, textOffset);
+      canvas.drawLine(offset, offset2, linePaint);
+    }
   }
 
   drawYAxisValues(Canvas canvas, Size size, double min, double max) {
+    Paint linePaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+
     for (int i = 1; i <= 4; i++) {
       TextPainter textPainter = TextPainter(
         text: TextSpan(
@@ -52,10 +68,6 @@ class GraphPainter extends CustomPainter {
         ),
         textDirection: TextDirection.ltr,
       );
-      Paint linePaint = Paint()
-        ..color = Colors.black
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2;
       textPainter.layout(minWidth: 20, maxWidth: size.width);
       final offset = Offset(
         AXIS_OFFSET,
@@ -102,15 +114,13 @@ class GraphPainter extends CustomPainter {
         size.height -
             (size.height * getRangePercentage(minY, maxY, points[i + 2].y)),
       );
-
-      drawXAxisValue(canvas, points[i], size,
-          size.width * getRangePercentage(minX, maxX, points[i].x));
     }
 
     canvas.drawLine(
         Offset(0, size.height), Offset(size.width, size.height), axisPaint);
     canvas.drawLine(Offset(0, size.height), Offset(0, 0), axisPaint);
     drawYAxisValues(canvas, size, minY, maxY);
+    drawXAxisValues(canvas, size, minX, maxX);
     canvas.drawPath(graphPath, graphPaint);
   }
 
