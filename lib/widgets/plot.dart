@@ -14,15 +14,13 @@ class Plot extends StatelessWidget {
     return (plotData is String)
         ? Image.network(
             plotData,
+            excludeFromSemantics: true,
             fit: BoxFit.cover,
             loadingBuilder: (_, child, loading) {
-              if (loading == null) return child;
+              if (loading == null && (child as RawImage).image != null)
+                return child;
 
-              return CircularProgressIndicator(
-                value: loading.expectedTotalBytes != null
-                    ? loading.cumulativeBytesLoaded / loading.expectedTotalBytes
-                    : null,
-              );
+              return CircularProgressIndicator();
             },
           )
         : CircularProgressIndicator();
