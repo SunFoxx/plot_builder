@@ -10,10 +10,7 @@ class ExpressionNode {
   ExpressionNode rightNode;
 
   ExpressionNode(String rootExpression) {
-    print('---------');
     baseExpression = adjustExpression(rootExpression);
-    print(baseExpression);
-
     int latestOperatorIndex = findLatestOperatorIndex(baseExpression);
     bool isSqrtOperator = latestOperatorIndex != -1
         ? baseExpression[latestOperatorIndex] == 's'
@@ -22,20 +19,15 @@ class ExpressionNode {
     if (latestOperatorIndex <= 0 && !isSqrtOperator) {
       try {
         operand = double.parse(baseExpression);
-        print(
-            'Node $operand with exp: $baseExpression; latestOperator: $latestOperatorIndex;');
       } catch (e) {
         throw InvalidSyntaxException(baseExpression);
       }
     } else {
       operator = baseExpression[latestOperatorIndex];
-      print(
-          'Node $operator with exp: $baseExpression; latestOperator: $latestOperatorIndex;');
 
       if (!isSqrtOperator) {
         String leftExpression =
             baseExpression.substring(0, latestOperatorIndex);
-        print('Left node: $leftExpression');
         leftNode = ExpressionNode(leftExpression);
       }
 
@@ -48,7 +40,6 @@ class ExpressionNode {
         throw InvalidSyntaxException(baseExpression);
       }
 
-      print('Right node: $rightExpression');
       rightNode = ExpressionNode(rightExpression);
     }
   }

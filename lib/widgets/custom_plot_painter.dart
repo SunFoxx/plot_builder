@@ -7,10 +7,10 @@ import 'package:function_printer/utils/calculations.dart';
 
 const double AXIS_OFFSET = 15;
 
-class GraphPainter extends CustomPainter {
+class CustomPlotPainter extends CustomPainter {
   List<Point> points;
 
-  GraphPainter(this.points);
+  CustomPlotPainter(this.points);
 
   void drawXAxisValues(Canvas canvas, Size size, double min, double max) {
     Paint linePaint = Paint()
@@ -125,5 +125,6 @@ class GraphPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(GraphPainter oldDelegate) => oldDelegate.points != points;
+  bool shouldRepaint(CustomPlotPainter oldDelegate) =>
+      oldDelegate.points != points;
 }

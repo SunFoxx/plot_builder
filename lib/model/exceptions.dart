@@ -19,3 +19,8 @@ class DivisionByZeroException implements Exception {
   @override
   String toString() => 'Selected range involves division by zero';
 }
+
+class InvalidRangeException implements Exception {
+  @override
+  String toString() => 'Given range must be in ascending order';
+}

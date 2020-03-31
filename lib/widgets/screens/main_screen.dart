@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:function_printer/services/graph_service.dart';
+import 'package:function_printer/services/plot_service.dart';
 import 'package:function_printer/state/app_state.dart';
 import 'package:function_printer/theme/text_theme.dart';
-import 'package:function_printer/widgets/graph_painter.dart';
 import 'package:function_printer/widgets/input_field.dart';
+import 'package:function_printer/widgets/plot.dart';
 import 'package:function_printer/widgets/radio_button.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +14,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   String expressionInput;
+  PlotServiceType plotServiceType = PlotServiceType.MANUAL;
 
   @override
   Widget build(BuildContext context) {
@@ -89,20 +90,24 @@ class _MainScreenState extends State<MainScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             RadioButton(
-                              value: GraphServiceType.MANUAL,
-                              groupValue: state.graphServiceType,
+                              value: PlotServiceType.MANUAL,
+                              groupValue: plotServiceType,
                               label: "Custom",
                               onChanged: (value) {
-                                state.graphServiceType = value;
+                                setState(() {
+                                  plotServiceType = value;
+                                });
                               },
                             ),
                             SizedBox(width: 5),
                             RadioButton(
-                              value: GraphServiceType.WOLFRAM,
-                              groupValue: state.graphServiceType,
+                              value: PlotServiceType.WOLFRAM,
+                              groupValue: plotServiceType,
                               label: "Wolfram",
                               onChanged: (value) {
-                                state.graphServiceType = value;
+                                setState(() {
+                                  plotServiceType = value;
+                                });
                               },
                             ),
                           ],
@@ -110,7 +115,12 @@ class _MainScreenState extends State<MainScreen> {
                         SizedBox(height: 10),
                         // Button
                         RaisedButton(
-                          onPressed: state.buildGraphPoints,
+                          onPressed: () {
+                            state.plotServiceType = plotServiceType;
+                            state.buildPlotData();
+                            FocusScope.of(context)
+                                .requestFocus(new FocusNode());
+                          },
                           color: Colors.lightBlueAccent,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20)),
@@ -134,25 +144,13 @@ class _MainScreenState extends State<MainScreen> {
               ),
               // content section
               Consumer<AppState>(builder: (_, state, child) {
-                if (state.graphPoints == null) {
-                  return Padding(
-                    padding: EdgeInsets.all(15.0),
-                    child: Text('nothing to draw'),
-                  );
-                }
-
                 if (state.expressionError != null) {
                   return SizedBox();
                 }
 
-                return Container(
-                  padding: EdgeInsets.all(5.0),
-                  child: CustomPaint(
-                    painter: GraphPainter(state.graphPoints),
-                    size: Size(double.infinity, 200),
-                    willChange: true,
-                    isComplex: true,
-                  ),
+                return Plot(
+                  serviceType: state.plotServiceType,
+                  plotData: state.plotData,
                 );
               })
             ],

@@ -1,47 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:function_printer/model/point.dart';
-import 'package:function_printer/services/graph_service.dart';
+import 'package:function_printer/services/plot_service.dart';
 
 class AppState extends ChangeNotifier {
   String _expression;
   String _expressionError;
   double _leftRange;
   double _rightRange;
-  List<Point> _graphPoints;
-  GraphServiceType _graphServiceType;
+  dynamic _plotData;
+  PlotServiceType _plotServiceType;
 
-  AppState() : _graphServiceType = GraphServiceType.MANUAL;
+  AppState() : _plotServiceType = PlotServiceType.MANUAL;
 
-  void buildGraphPoints() async {
-    if (_expression == null ||
-        _leftRange == null ||
-        _rightRange == null ||
-        _expression.length == 0) {
-      _expressionError = "Fill all input fields first";
+  void buildPlotData() async {
+    if (expression == null ||
+        leftRange == null ||
+        rightRange == null ||
+        expression.length == 0) {
+      expressionError = "Fill all input fields first";
       return;
     }
 
     try {
-      _graphPoints = await GRAPH_SERVICE_MAP[_graphServiceType]
-          .getGraphPoints(_expression, _leftRange, _rightRange);
-      _expressionError = null;
-      notifyListeners();
+      plotData = await PLOT_SERVICE_MAP[plotServiceType]
+          .getPlotData(_expression, leftRange, rightRange);
+      expressionError = null;
     } catch (e) {
-      _expressionError = e.toString();
-      notifyListeners();
-    }
-  }
-
-  void setGraphService(String serviceName) {
-    switch (serviceName) {
-      case "manual":
-        _graphServiceType = GraphServiceType.MANUAL;
-        break;
-      case "wolfram":
-        _graphServiceType = GraphServiceType.WOLFRAM;
-        break;
-      default:
-        break;
+      expressionError = e.toString();
     }
   }
 
@@ -49,8 +33,8 @@ class AppState extends ChangeNotifier {
   double get rightRange => _rightRange;
   String get expression => _expression;
   String get expressionError => _expressionError;
-  GraphServiceType get graphServiceType => _graphServiceType;
-  List<Point> get graphPoints => _graphPoints;
+  PlotServiceType get plotServiceType => _plotServiceType;
+  dynamic get plotData => _plotData;
 
   set rightRange(double value) {
     _rightRange = value;
@@ -72,13 +56,13 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  set graphServiceType(GraphServiceType value) {
-    _graphServiceType = value;
+  set plotServiceType(PlotServiceType value) {
+    _plotServiceType = value;
     notifyListeners();
   }
 
-  set graphPoints(List<Point> value) {
-    _graphPoints = value;
+  set plotData(dynamic value) {
+    _plotData = value;
     notifyListeners();
   }
 }

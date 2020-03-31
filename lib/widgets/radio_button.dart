@@ -18,7 +18,9 @@ class RadioButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        onChanged(value);
+        if (onChanged != null && value != groupValue) {
+          onChanged(value);
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),

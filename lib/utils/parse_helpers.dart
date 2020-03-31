@@ -29,6 +29,7 @@ int findLatestOperatorIndex(String expression) {
         return furthestIndex;
       }
     }
+
     if (operatorGroup.direction == TextDirection.rtl) {
       int closestIndex = maskedText.length;
       operatorGroup.operators.forEach((operator) {
