@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:function_printer/model/exceptions.dart';
 import 'package:function_printer/model/operator.dart';
 
 String adjustExpression(String baseExpression) {
@@ -111,6 +112,12 @@ String ceaseBrackets(String expression) {
 }
 
 String setVariableValues(String expression, double value) {
+  RegExp testForStuck = RegExp(r"([\d\)s]\s*x\s*)|(\s*x\s*[\d\(s])");
+
+  if (testForStuck.hasMatch(expression)) {
+    throw InvalidSyntaxException(testForStuck.firstMatch(expression).group(0));
+  }
+
   if (value >= 0) {
     return expression.replaceAll('x', '$value');
   }
