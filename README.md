@@ -1,16 +1,20 @@
-# function_printer
+# plot_builder
 
-An app that prints a graph by the given function
+An app that prints a plot by the given f(x)
+Supported operators: + - * / ( ) ^ sqrt
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To launch:
+```
+    flutter pub get
+    flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Estimations
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+6h - Parser code with binary tree destructuring and postfix calculation
+3h - Custom plot painting
+2h - Wolfram implementation
+2h - Layout
+1h - Refactoring
